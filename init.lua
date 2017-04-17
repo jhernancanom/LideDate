@@ -3,7 +3,7 @@
 -- // Author:      Hernan Cano [jhernancanom@gmail.com]
 -- // Created:     2016-03-21
 -- // Copyright:   (c) 2016 Hernan Cano
--- // License:     lide license
+-- // License:     MIT/X11
 -- /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ---
 --- >> Class constructor:
@@ -24,8 +24,6 @@
 ---      number    getLastMonthDay()   Gets the last day of the month in this date
 ---      number    getFirstMonthDay()  Gets the first day of the month in this date
 ---      string    toString()          Convert Date to string
----
---- lua v5.1.5
 ---
 
 local DATE_TODAY     = 0
