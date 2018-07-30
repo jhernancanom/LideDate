@@ -20,6 +20,15 @@
 -- 
 
 
+io.stdout : write 'Probando tal cosa '
+
+assert(true == true, 'errormsg')
+
+io.stdout : write '[OK'
+
+assert(false, 'talerr asdsadasvfsaf ')
+
+
 local lide = require "lide.widgets.init"  -- base   -- lidedate
 local date = lide.classes.date
 
@@ -79,11 +88,6 @@ for i = 2000, 2010 do
   end
 end
 
-io.stdout : write 'Probando tal cosa '
-
-assert(true == true, 'errormsg')
-
-io.stdout : write '[OK'
 
 --
  
