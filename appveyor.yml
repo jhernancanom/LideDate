@@ -34,6 +34,7 @@ build_script:
 
   # Create lide install directory and go to it (C:\lide):
   - mkdir C:\lide
+  - dir
 
   # Clone git repository and submodules:
   - git clone https://github.com/lidesdk/shell.git --recursive C:\lide\shell && cd C:\lide\shell && git checkout %CURRENT_BRANCH% && cd C:\lide\shell\libraries\lide && git checkout %CURRENT_BRANCH%
