@@ -19,6 +19,7 @@
 -- lide sample_lidedate.lua
 -- 
 
+package.path = 'c:\\lide\\shell\\libraries\\?.lua;' .. package.path
 
 io.stdout : write 'Probando tal cosa '
 
