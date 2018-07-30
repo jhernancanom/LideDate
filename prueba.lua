@@ -79,6 +79,10 @@ for i = 2000, 2010 do
   end
 end
 
+assert(true == true, 'errormsg')
+
+print 'OK'
+
 --
  
 --- OUTPUT ---
