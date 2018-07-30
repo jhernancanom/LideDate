@@ -79,9 +79,11 @@ for i = 2000, 2010 do
   end
 end
 
+io.stdout : write 'Probando tal cosa '
+
 assert(true == true, 'errormsg')
 
-print 'OK'
+io.stdout : write '[OK'
 
 --
  
