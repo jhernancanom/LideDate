@@ -1,18 +1,23 @@
-version: 0.1-{build}
+version: 0.1.{build}-dev
 
 shallow_clone: true
 
 environment:
   LUAROCKS_VER: 2.4.1
-  LUA_VER: 5.1.5
-  CURRENT_BRANCH: develop
+  LUA_VER: 5.1.4
+  CURRENT_BRANCH: master
 
 platform:
   - x86
+  - x64
 
 cache:
   - c:\lua -> appveyor.yml
   - c:\external -> appveyor.yml
+
+# Skip unsupported combinations (ie, VS2008 for x64 is not supported)
+init:
+- if "%platform%" EQU "x64" ( for %%a in (2008 2010 MinGW) do ( if "%Configuration%"=="%%a" (echo "Skipping unsupported configuration" && exit /b 1 ) ) )
 
 install:
 - git clone https://github.com/lidesdk/appveyor_lua.git .appveyor
@@ -21,11 +26,21 @@ install:
 # Setup Lua development/build environment
 - call .appveyor\install.bat
 
+before_build:
+  - echo "Installing external deps"
+  - luarocks install luafilesystem
+
 build_script:
-  #- luarocks install luafilesystem
-  - set LIDE_PATH=%CD%
-  - git clone https://github.com/lidesdk/framework.git %LIDE_PATH%/libraries/lide && cd %LIDE_PATH%/libraries/lide && git checkout %CURRENT_BRANCH%
+
+  # Create lide install directory and go to it (C:\lide):
+  - mkdir C:\lide
+
+  # Clone git repository and submodules:
+  - git clone https://github.com/lidesdk/shell.git --recursive C:\lide\shell && cd C:\lide\shell && git checkout %CURRENT_BRANCH% && cd C:\lide\shell\libraries\lide && git checkout %CURRENT_BRANCH%
+
+  # Create environment variable named LIDE_PATH:
+  - set LIDE_PATH=C:\lide\shell
+  - set PATH=%LIDE_PATH%;%PATH%
 
 test_script:
-  - cd %LIDE_PATH%
-  - lua tests\windows_x86_shell_test.lua
+- lide prueba.lua
