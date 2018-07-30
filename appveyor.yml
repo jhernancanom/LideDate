@@ -43,4 +43,5 @@ build_script:
   - set PATH=%LIDE_PATH%;%PATH%
 
 test_script:
+- dir
 - lide prueba.lua
