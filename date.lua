@@ -107,9 +107,9 @@ function Date:Date( fields )
 
    -- another constructor
    -- function Date:Date( ... )
-   if type(fields) == 'number' then -- cannot use ... outside a vararg
-      self.Year, self.Month, self.Day  = ...
-   end
+   --if type(fields) == 'number' then -- cannot use ... outside a vararg
+    --  self.Year, self.Month, self.Day  = ...
+ --  end
        
 end 
 
