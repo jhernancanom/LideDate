@@ -1,0 +1,31 @@
+version: 0.1-{build}
+
+shallow_clone: true
+
+environment:
+  LUAROCKS_VER: 2.4.1
+  LUA_VER: 5.1.5
+  CURRENT_BRANCH: develop
+
+platform:
+  - x86
+
+cache:
+  - c:\lua -> appveyor.yml
+  - c:\external -> appveyor.yml
+
+install:
+- git clone https://github.com/lidesdk/appveyor_lua.git .appveyor
+# Make compiler command line tools available
+- call .appveyor\set_compiler_env.bat
+# Setup Lua development/build environment
+- call .appveyor\install.bat
+
+build_script:
+  #- luarocks install luafilesystem
+  - set LIDE_PATH=%CD%
+  - git clone https://github.com/lidesdk/framework.git %LIDE_PATH%/libraries/lide && cd %LIDE_PATH%/libraries/lide && git checkout %CURRENT_BRANCH%
+
+test_script:
+  - cd %LIDE_PATH%
+  - lua tests\windows_x86_shell_test.lua
