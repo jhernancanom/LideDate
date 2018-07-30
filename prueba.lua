@@ -19,7 +19,7 @@
 -- lide sample_lidedate.lua
 -- 
 
-package.path = 'c:\\lide\\shell\\libraries\\?.lua;' .. package.path
+package.path = 'c:\\lide\\shell\\libraries\\?.lua;c:\\projects\\lidedate\\?.lua;' .. package.path
 
 io.stdout : write 'Probando tal cosa '
 
@@ -29,10 +29,7 @@ io.stdout : write '[OK'
 
 --assert(false, 'talerr asdsadasvfsaf ')
 
-
-local lide = require "lide.widgets.init"  -- base   -- lidedate
-local date = lide.classes.date
-
+local date = require 'date'
 
 -- -- constructor numerico
 
