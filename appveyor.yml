@@ -44,4 +44,4 @@ build_script:
 
 test_script:
 - cd c:\projects\lidedate
-- lide prueba.lua
+- lua prueba.lua
