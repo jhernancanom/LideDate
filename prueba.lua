@@ -26,7 +26,7 @@ assert(true == true, 'errormsg')
 
 io.stdout : write '[OK'
 
-assert(false, 'talerr asdsadasvfsaf ')
+--assert(false, 'talerr asdsadasvfsaf ')
 
 
 local lide = require "lide.widgets.init"  -- base   -- lidedate
