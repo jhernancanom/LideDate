@@ -36,30 +36,68 @@ local function ftzero (num)
    return sCode
 end
 
-function Date:Date( fields )
-   fields = fields or DATE_TODAY
-   
-   if ( fields == DATE_TODAY ) then
+function Substr(pCad,p1,p2)
+   return string.sub (pCad, p1, p1+p2)
+end
+
+function Left(pCad,pNum)
+   return string.sub (pCad, 1, pNum)
+end
+
+function Right(pCad,pNum)
+   return string.sub (pCad, -pNum)
+end
+
+function Date:Date( ... )
+
+   if type(...) == 'number' and not ( ... == DATE_TODAY ) then
+      -- 
       local t = os.date '*t'
-      self.Year  =        t.year
-      self.Month = ftzero(t.month)
-      self.Day   = ftzero(t.day  )
-      self.wDay  =       (t.wday ) -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
+      t.year, t.month, t.day  = ...	  
+	  if tonumber(t.year)<1970 then
+	     error ( "\n\n-- fecha inválida -- "..tostring(t.year).."-"..tostring(t.month).."-"..tostring(t.day).."\n" )
+ 	  end
+      -- 
+         -- 
+	     t = os.date("*t", os.time(t))  -- Nomalization -- PiL4 - Chapter 12. Date and Time (pag 95)
+         -- 
+         self.Year  =        t.year
+         self.Month = ftzero(t.month)
+         self.Day   = ftzero(t.day  )
+         self.wDay  =       (t.wday ) -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
+         -- 
+   else
+
+      fields = ... or DATE_TODAY
+      
+      if ( fields == DATE_TODAY ) then
+         local t = os.date '*t'
+         self.Year  =        t.year
+         self.Month = ftzero(t.month)
+         self.Day   = ftzero(t.day  )
+         self.wDay  =       (t.wday ) -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
+      end
    end
   
    if type(fields) == 'table' then
       -- 
-      local t = os.date '*t'
-      t.year  = fields.Year
-      t.month = fields.Month
-      t.day   = fields.Day  
-      -- 
-	  t = os.date("*t", os.time(t))  -- Nomalization -- PiL4 - Chapter 12. Date and Time (pag 95)
-      -- 
-      self.Year  =        t.year
-      self.Month = ftzero(t.month)
-      self.Day   = ftzero(t.day  )
-      self.wDay  =       (t.wday ) -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
+	  if tonumber(fields.Year)<1970 then
+	     error ( '\n\n-- fecha inválida -- '..tostring(fields.Year)..'-'..tostring(fields.Month)..'-'..tostring(fields.Day)..'\n' )
+      else
+	     -- 
+         local t = os.date '*t'
+         t.year  = fields.Year
+         t.month = fields.Month
+         t.day   = fields.Day  
+         -- 
+	     t = os.date("*t", os.time(t))  -- Nomalization -- PiL4 - Chapter 12. Date and Time (pag 95)
+         -- 
+         self.Year  =        t.year
+         self.Month = ftzero(t.month)
+         self.Day   = ftzero(t.day  )
+         self.wDay  =       (t.wday ) -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
+         -- 
+	  end
       -- 
    end
 
