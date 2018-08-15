@@ -14,41 +14,40 @@
 -- C:\lidesdk\shell\libraries\lide\classes\date.lua
 
 -- 
--- sintaxis
+-- Sintaxis
 -- 
 -- lide sample_lidedate.lua
 -- 
 
-package.path = 'c:\\lide\\shell\\libraries\\?.lua;c:\\projects\\lidedate\\?.lua;' .. package.path
+io.stdout : write '- Import date.lua library: '
 
-io.stdout : write 'Probando tal cosa '
-
-assert(true == true, 'errormsg')
-
-io.stdout : write '[OK'
-
---assert(false, 'talerr asdsadasvfsaf ')
+package.path = '?.lua;' .. package.path
 
 local date = require 'date'
 
+io.stdout : write '[OK]\n'
+
 -- -- constructor numerico
+io.stdout : write '- Probando constructor numerico: \n'
 
 t = date ( 1996, 2, 29 )
-print ( 'numerico   ', t.Year, t.Month, t.Day, t.wDay )
-
+print ( t.Year, t.Month, t.Day, t.wDay )
 
 -- -- constructor tabla con elementos numericos
+io.stdout : write '- Probando constructor tabla con elementos numericos: \n'
 
 t = date { Year = 1996, Month = 2, Day = 29 }
 print ( 'original   ', t.Year, t.Month, t.Day, t.wDay )
 
 -- -- constructor tabla con elementos string
+io.stdout : write '- Probando constructor tabla con elementos string: \n'
 
 t = date { Year = "1996", Month = "2", Day = "29" }
 print ( 'original-str', t.Year, t.Month, t.Day, t.wDay )
 
 
 -- -- funciones set..()
+io.stdout : write '- Probando funciones set: \n'
 
 t:setDay  ( t.Day-1 )
 print ( 'less 1 day ', t.Year, t.Month, t.Day, t.wDay )
@@ -61,21 +60,17 @@ t:setMonth( t.Month+1 )
 print ( 'more 1 month', t.Year, t.Month, t.Day, t.wDay )
 
 
+io.stdout : write '- Print all FRIDAY the 13th dates 2000-2010:\n'
 
 -- prints all FRIDAY the 13th dates between year 2000 and 2010
 
-for i = 2000, 2010 do
-   
+for i = 2000, 2010 do  
    -- year jan 1
-   -- x = date(i, 1, 1)
-   x = date{Year=i, Month=1, Day=1}
+   local x = date { Year=i, Month=1, Day=1 };
    
    -- from january to december
-   for j = 1, 12 do
-   
-      -- set date to 13, check if friday
-      -- x = date{Year=i, Month=j, Day=13}
-	  
+   for j = 1, 12 do  
+      -- set date to 13, check if friday	  
 	  x:setMonth(j)
 	  x:setDay(13)
       if x:getweekDay() == 6 then
@@ -86,7 +81,7 @@ for i = 2000, 2010 do
   end
 end
 
-
+print '\nlidedate tests: [OK]'
 --
  
 --- OUTPUT ---
