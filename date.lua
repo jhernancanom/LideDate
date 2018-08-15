@@ -1,4 +1,4 @@
-ï»¿-- ///////////////////////////////////////////////////////////////////
+-- ///////////////////////////////////////////////////////////////////
 -- // Name:      C:\lide_h\shell\libraries\lide\classes\date.lua
 -- ///////////////////////////////////////////////////////////////////
 -- // Name:      lide/classes/date.lua
@@ -57,7 +57,7 @@ function Date:Date( ... )
       local t = os.date '*t'
       t.year, t.month, t.day  = ...	  
 	  if tonumber(t.year)<1970 then
-	     error ( "\n\n-- fecha invÃ¡lida -- "..tostring(t.year).."-"..tostring(t.month).."-"..tostring(t.day).."\n" )
+	     error ( "\n\n-- fecha inválida -- "..tostring(t.year).."-"..tostring(t.month).."-"..tostring(t.day).."\n" )
  	  end
       -- 
          -- 
@@ -84,7 +84,7 @@ function Date:Date( ... )
    if type(fields) == 'table' then
       -- 
 	  if tonumber(fields.Year)<1970 then
-	     error ( '\n\n-- fecha invÃ¡lida -- '..tostring(fields.Year)..'-'..tostring(fields.Month)..'-'..tostring(fields.Day)..'\n' )
+	     error ( '\n\n-- fecha inválida -- '..tostring(fields.Year)..'-'..tostring(fields.Month)..'-'..tostring(fields.Day)..'\n' )
       else
 	     -- 
          local t = os.date '*t'
@@ -133,7 +133,7 @@ function Date:Date( ... )
          local fields = fields:delim (fchar)
       -- 
 	  if tonumber(fields[1])<1970 then
-		 error ( '\n\n-- fecha invÃ¡lida -- '..tostring(fields.Year)..'-'..tostring(fields.Month)..'-'..tostring(fields.Day)..'\n' )
+		 error ( '\n\n-- fecha inválida -- '..tostring(fields.Year)..'-'..tostring(fields.Month)..'-'..tostring(fields.Day)..'\n' )
       else
          local t = os.date '*t'
          t.year  = fields[1]  -- yyyy/mm/dd
@@ -157,7 +157,7 @@ function Date:Date( ... )
          -- 
       -- 
 	  if tonumber(Substr(fields,1,4))<1970 then
-	     error ( '\n\n-- fecha invÃ¡lida -- '..tostring(fields.Year)..'-'..tostring(fields.Month)..'-'..tostring(fields.Day)..'\n' )
+	     error ( '\n\n-- fecha inválida -- '..tostring(fields.Year)..'-'..tostring(fields.Month)..'-'..tostring(fields.Day)..'\n' )
       else
          local t = os.date '*t'
          t.year  = Substr(fields,1,4)  -- YYYYMMDD (without separator)
@@ -260,7 +260,7 @@ end
 function Date:setYear ( nYear )
    isNumber(nYear)
    if nYear<1970 then
-      error ( '\n\n-- aÃ±o invÃ¡lido -- '..tostring(nYear)..'\n' )
+      error ( '\n\n-- año inválido -- '..tostring(nYear)..'\n' )
    end
    self.Year = nYear
    self = self:Normalize()
@@ -270,7 +270,7 @@ end
 function Date:setMonth ( nMonth )
    isNumber(nMonth)
    if tonumber(self.Year)<1970 then
-      error ( '\n\n-- aÃ±o invÃ¡lido -- '..tostring(self.Year)..'\n' )
+      error ( '\n\n-- año inválido -- '..tostring(self.Year)..'\n' )
    end
    self.Month = nMonth
    self = self:Normalize()
@@ -280,7 +280,7 @@ end
 function Date:setDay ( nDay )
    isNumber(nDay)
    if tonumber(self.Year)<1970 then
-      error ( '\n\n-- aÃ±o invÃ¡lido -- '..tostring(self.Year)..'\n' )
+      error ( '\n\n-- año inválido -- '..tostring(self.Year)..'\n' )
    end
    self.Day = nDay
    self = self:Normalize()
@@ -301,7 +301,7 @@ function Date:getFirstMonthDay()
 end
 
 function Date:getLastMonthDay()
-   --- Si la fecha es febrero y es aÃ±o bisiesto :)
+   --- Si la fecha es febrero y es año bisiesto :)
    if ( self:getYear() % 4 == 0 ) and (self:getMonth() == 2) then
       return 29
    else
