@@ -8,7 +8,12 @@
 -- // Copyright: (c) 2017-2018 Hernan Dario Cano [dcanohdev [at] gmail.com]
 -- // License:   GNU GENERAL PUBLIC LICENSE
 -- ///////////////////////////////////////////////////////////////////
--- print 'archivo modificado'
+
+-- import required libraries:
+if not lide then require 'lide.core.init'; end
+
+local isNumber = lide.core.base.isnumber
+
 local DATE_TODAY     = 0
 local DATE_YESTERDAY = 1
 
@@ -26,11 +31,25 @@ local months = {
 
 local weekdays = { 'sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat' }
 
-lide = require 'lide.core.init'
+local function date_normalize ( self )
+   local tParm = self
+   
+   local t = { year=0, month=0, day=0, wday=0 } --os.date '*t'
+   
+   t.year  = self:getYear    'number'
+   t.month = self:getMonth   'number'
+   t.day   = self:getDay     'number'
+   t.wday  = self:getweekDay 'number'  
+     
+   t = ( os.date("*t", os.time(t)) ) -- Normalization -- PiL4 - Chapter 12. Date and Time (pag 95)
+   
+   tParm.Year  = t.year  
+   tParm.Month = t.month 
+   tParm.Day   = t.day   
+   tParm.wDay  = t.wday
 
-local isNumber = lide.core.base.isnumber
-
-local Date = class 'Date'
+   return ( tParm );
+end
 
 local function ftzero (num)
    local sCode = "00" .. tonumber( num )
@@ -38,126 +57,97 @@ local function ftzero (num)
    return sCode
 end
 
-function Substr(pCad,p1,p2)
+local function Substr(pCad,p1,p2)
    return string.sub (pCad, p1, p1+p2)
 end
 
-function Left(pCad,pNum)
+local function Left(pCad,pNum)
    return string.sub (pCad, 1, pNum)
 end
 
-function Right(pCad,pNum)
+local function Right(pCad,pNum)
    return string.sub (pCad, -pNum)
 end
 
+local Date = class 'Date'
+
 function Date:Date( ... )
 
-   if type(...) == 'number' and not ( ... == DATE_TODAY ) then
+   local fields;
+
+   if ( ... == DATE_TODAY ) then
+      local t = os.date '*t'
+
+      self.Year  =        t.year
+      self.Month = ftzero(t.month)
+      self.Day   = ftzero(t.day  )
+      self.wDay  =       (t.wday ) -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
+   end
+
+   --- Numeric constructor:
+   ---
+   if type(...) == 'number' then
       -- 
       local t = os.date '*t'
       t.year, t.month, t.day  = ...	  
-	  if tonumber(t.year)<1970 then
-	     error ( "\n\n-- fecha inválida -- "..tostring(t.year).."-"..tostring(t.month).."-"..tostring(t.day).."\n" )
- 	  end
-      -- 
-         -- 
-	     t = os.date("*t", os.time(t))  -- Nomalization -- PiL4 - Chapter 12. Date and Time (pag 95)
-         -- 
-         self.Year  =        t.year
-         self.Month = ftzero(t.month)
-         self.Day   = ftzero(t.day  )
-         self.wDay  =       (t.wday ) -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
-         -- 
-   else
-
-      fields = ... or DATE_TODAY
       
-      if ( fields == DATE_TODAY ) then
-         local t = os.date '*t'
-         self.Year  =        t.year
-         self.Month = ftzero(t.month)
-         self.Day   = ftzero(t.day  )
-         self.wDay  =       (t.wday ) -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
-      end
-   end
-  
-   if type(fields) == 'table' then
-      -- 
-	  if tonumber(fields.Year)<1970 then
-	     error ( '\n\n-- fecha inválida -- '..tostring(fields.Year)..'-'..tostring(fields.Month)..'-'..tostring(fields.Day)..'\n' )
-      else
-	     -- 
-         local t = os.date '*t'
-         t.year  = fields.Year
-         t.month = fields.Month
-         t.day   = fields.Day  
-         -- 
-	     t = os.date("*t", os.time(t))  -- Nomalization -- PiL4 - Chapter 12. Date and Time (pag 95)
-         -- 
-         self.Year  =        t.year
-         self.Month = ftzero(t.month)
-         self.Day   = ftzero(t.day  )
-         self.wDay  =       (t.wday ) -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
-         -- 
-	  end
-      -- 
+      isNumber(t.year); isNumber(t.month); isNumber(t.day);
+      
+      t = os.date("*t", os.time(t))  -- Normalization -- PiL4 - Chapter 12. Date and Time (pag 95)
+
+      self.Year  =       (t.year )
+      self.Month = ftzero(t.month)
+      self.Day   = ftzero(t.day  )
+      self.wDay  =       (t.wday )   -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
    end
 
-   if type(fields) == 'string' then
+   --- Table/Fields constructor:
+   --- 
+   if type(...) == 'table' then
+	   fields = ... ;
+
+      local t = os.date '*t'
+      t.year, t.month, t.day = fields.Year, fields.Month, fields.Day  
+
+	   t = os.date("*t", os.time(t))  -- Normalization -- PiL4 - Chapter 12. Date and Time (pag 95)
+         -- 
+      self.Year  =        t.year
+      self.Month = ftzero(t.month)
+      self.Day   = ftzero(t.day  )
+      self.wDay  =       (t.wday ) -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
+   end
+
+   if type(...) == 'string' then   
+      -- find separator:
       local fchar
-
-          if fields:find '/' then 
-         fchar = '/'
-
-      elseif fields:find '-' then
-         fchar = '-'
-		 
-      elseif fields:find '.' then  -- added HCano
-         fchar = '.'
+      if fields:find '/' then     fchar = '/';
+      elseif fields:find '-' then fchar = '-';
+		elseif fields:find '.' then fchar = '.'; -- added HCano
       end
 
       if fchar then
-	  
-         -- 
-	     -- -- before
-         -- 
-         -- local fields = fields:delim (fchar)
-         -- self.Year  = fields[1]  -- yyyy/mm/dd
-         -- self.Month = fields[2]
-         -- self.Day   = fields[3]
-	     -- -- 
-	  
-         -- 
-         -- current...
-         -- 
          local fields = fields:delim (fchar)
-      -- 
-	  if tonumber(fields[1])<1970 then
-		 error ( '\n\n-- fecha inválida -- '..tostring(fields.Year)..'-'..tostring(fields.Month)..'-'..tostring(fields.Day)..'\n' )
-      else
+
          local t = os.date '*t'
-         t.year  = fields[1]  -- yyyy/mm/dd
-         t.month = fields[2]
-         t.day   = fields[3]
-         -- 
-	     t = os.date("*t", os.time(t))  -- Nomalization -- PiL4 - Chapter 12. Date and Time (pag 95)
+         
+         t.year, t.month, t.day = fields[1], fields[2], fields[3]  -- yyyy/mm/dd
+         ---
+	      t = os.date("*t", os.time(t))  -- Normalization -- PiL4 - Chapter 12. Date and Time (pag 95)
          -- 
          self.Year  =        t.year
          self.Month = ftzero(t.month)
          self.Day   = ftzero(t.day  )
          self.wDay  =       (t.wday ) -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
-         -- 
       end
 	  
-      else
-         -- 
-         -- ------------- pendiente de probar
-         -- 
-	     -- what if not separator???  20180722  YYYMMDD
-         -- 
       -- 
-	  if tonumber(Substr(fields,1,4))<1970 then
-	     error ( '\n\n-- fecha inválida -- '..tostring(fields.Year)..'-'..tostring(fields.Month)..'-'..tostring(fields.Day)..'\n' )
+      -- ------------- pendiente de probar
+      -- 
+	   -- what if not separator???  20180722  YYYMMDD
+      -- 
+      --[[ 
+	   if tonumber(Substr(fields,1,4))<1970 then
+	      error ( '\n\n-- fecha inválida -- '..tostring(fields.Year)..'-'..tostring(fields.Month)..'-'..tostring(fields.Day)..'\n' )
       else
          local t = os.date '*t'
          t.year  = Substr(fields,1,4)  -- YYYYMMDD (without separator)
@@ -171,22 +161,16 @@ function Date:Date( ... )
          self.Day   = ftzero(t.day  )
          self.wDay  =       (t.wday ) -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
          -- 
-      end
-		     
-      end
+      end]]
    end
-
+   
+   if tonumber(self.Year) < 1970 then
+      error ( ("Invalid date '%s-%s-%s'"):format(self.Year, self.Month, self.Day) );
+   end
 end 
 
 function Date:__tostring( ... )
-   return ('%s-%s-%s'):format(self.Year, self:getMonth 'string', self:getDay 'string')
-   -- return ('%s-%s-%s'):format(self.Year, self:getMonth 'name'OK, self:getDay 'string')
-   -- return ('%s-%d-%d'):format(self.Year, self:getMonth 'number', self:getDay 'number')
-   -- return ('%d-%d-%d'):format( self.Year, self.Month, self:getDay() )
-   
-   -- print( '__tostring',self.Year, self.Month, self.Day )
-   -- return self.Year..self.Month..self.Day
-   
+    return ('%s-%s-%s'):format(self.Year, self:getMonth 'string', self:getDay 'string') 
 end
 
 function Date:toString ( ... )  
@@ -233,20 +217,11 @@ function Date:getDay ( what )
     return tonumber(self.Day)
 end
 
-
 -- 2018-07-15 HCano added getweekDay -- tried !!!
 function Date:getweekDay ( what )
     	
     local fields  = (what) or 'number'
-	
-    -- if self.wDay then
-    --   return tonumber(self.wDay)
-    -- end
-    -- if self.wday then
-    --   return tonumber(self.wday)
-    -- end
-    -- return 0
-	-- print ('name',fields)
+
     if (fields == '%s') or (fields:lower() == 'name') then  --OK!!!
         return weekdays[tonumber(self.wDay)]  --OK!!!
     elseif (fields == '%d') or (fields:lower() == 'number') then
@@ -263,30 +238,38 @@ function Date:setYear ( nYear )
       error ( '\n\n-- año inválido -- '..tostring(nYear)..'\n' )
    end
    self.Year = nYear
-   self = self:Normalize()
+   self = date_normalize(self);
    return self.Year == nYear
 end
 
 function Date:setMonth ( nMonth )
-   isNumber(nMonth)
+   isNumber(nMonth);
+   
    if tonumber(self.Year)<1970 then
       error ( '\n\n-- año inválido -- '..tostring(self.Year)..'\n' )
    end
+
    self.Month = nMonth
-   self = self:Normalize()
-   return self.Month == nMonth
+   self = date_normalize(self);
+   
+   return ( self.Month == nMonth )
 end
 
 function Date:setDay ( nDay )
-   isNumber(nDay)
+   isNumber(nDay);
+
    if tonumber(self.Year)<1970 then
       error ( '\n\n-- año inválido -- '..tostring(self.Year)..'\n' )
    end
+
    self.Day = nDay
-   self = self:Normalize()
-   return self.Day == nDay
+   self = date_normalize(self);
+
+   return ( self.Day == nDay )
 end
 
+--- !DEPRECATED by jhernancanom: e2c695c
+---
 -- impractical (( more practical is SetDayOfYear))
 -- -- 2018-07-15 HCano added setweekDay -- without proof yet... need normalize????
 -- function Date:setweekDay ( nDay )
@@ -294,7 +277,6 @@ end
 --    self.wDay = nDay
 --    return self.wDay == nDay
 -- end
-
 
 function Date:getFirstMonthDay()
    return 1
@@ -309,36 +291,10 @@ function Date:getLastMonthDay()
    end
 end
 
-
-function Date:Normalize(tParm)
-   
-   local tParm = tParm or self
-      local t = { year=0, month=0, day=0, wday=0 } --os.date '*t'
-      if tParm.year  then t.year  = tParm.year  end
-      if tParm.month then t.month = tParm.month end
-      if tParm.day   then t.day   = tParm.day   end
-      if tParm.wday  then t.wday  = tParm.wday  end
-	  
-      if tParm.Year  then t.year  = tParm.Year  end
-      if tParm.Month then t.month = tParm.Month end
-      if tParm.Day   then t.day   = tParm.Day   end
-      if tParm.wDay  then t.wday  = tParm.wDay  end
-	  
-      t = ( os.date("*t", os.time(t)) ) -- Nomalization -- PiL4 - Chapter 12. Date and Time (pag 95)
-	  
-      tParm.Year  = t.year  
-      tParm.Month = t.month 
-      tParm.Day   = t.day   
-      tParm.wDay  = t.wday   
-
-      return ( tParm ) 
-   
-end   
-
 return Date
 
--- usage: 
+-- Usage: 
 --
 -- birthday = Date { Year = '1996', Month = '02', Day = '29' }
-
---
+-- birthday = Date { Year = 1996, Month = 02, Day = 29 }
+-- birthday = Date (1996, 02, 29);
