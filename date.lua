@@ -13,6 +13,7 @@
 if not lide then require 'lide.core.init'; end
 
 local isNumber = lide.core.base.isnumber
+local isString = lide.core.base.isstring
 
 local DATE_TODAY     = 0
 local DATE_YESTERDAY = 1
@@ -64,7 +65,7 @@ end
 local function Left(pCad,pNum)
    return string.sub (pCad, 1, pNum)
 end
-
+   
 local function Right(pCad,pNum)
    return string.sub (pCad, -pNum)
 end
@@ -73,7 +74,7 @@ local Date = class 'Date'
 
 function Date:Date( ... )
 
-   local fields;
+   local fields = ...;
 
    if ( ... == DATE_TODAY ) then
       local t = os.date '*t'
@@ -89,6 +90,7 @@ function Date:Date( ... )
    if type(...) == 'number' then
       -- 
       local t = os.date '*t'
+
       t.year, t.month, t.day  = ...	  
       
       isNumber(t.year); isNumber(t.month); isNumber(t.day);
@@ -99,25 +101,30 @@ function Date:Date( ... )
       self.Month = ftzero(t.month)
       self.Day   = ftzero(t.day  )
       self.wDay  =       (t.wday )   -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
-   end
-
+   
+   elseif type(...) == 'table' then
    --- Table/Fields constructor:
    --- 
-   if type(...) == 'table' then
-	   fields = ... ;
+   
+	   fields = (...) ;
 
       local t = os.date '*t'
       t.year, t.month, t.day = fields.Year, fields.Month, fields.Day  
-
+--[[
+      if type(t.day) == 'number' then
+         isNumber(t.year); isNumber(t.month); isNumber(t.day);
+      elseif type(t.day) == 'string' then
+         isString(t.year); isString(t.month); isString(t.day);
+      end
+]]--
 	   t = os.date("*t", os.time(t))  -- Normalization -- PiL4 - Chapter 12. Date and Time (pag 95)
          -- 
       self.Year  =        t.year
       self.Month = ftzero(t.month)
       self.Day   = ftzero(t.day  )
       self.wDay  =       (t.wday ) -- in os.date the field wday exists....[1..7] according to PiL4 - Date and Time.
-   end
-
-   if type(...) == 'string' then   
+   
+   elseif type(...) == 'string' then   
       -- find separator:
       local fchar
       if fields:find '/' then     fchar = '/';
@@ -178,6 +185,8 @@ function Date:toString ( ... )
 end
 
 function Date:getYear ( what )
+   if what then isString(what); end
+
     local what  = (what) or 'number'
     if what == 'string' then
        return tostring (self.Year)
@@ -186,10 +195,11 @@ function Date:getYear ( what )
 end
 
 -- by default returns a number
-function Date:getMonth ( ... )
-    	
-    local fields  = (...) or 'number'
-    
+function Date:getMonth ( what )
+    if what then isString(what); end
+
+    local fields  = (what) or 'number'
+       
     -- fields debe ser un string...    
     if (fields == '%s') or (fields:lower() == 'name') then  --OK!!!
         return months[tonumber(self.Month)]  --OK!!!
@@ -206,7 +216,10 @@ function Date:getMonth ( ... )
 end
 
 function Date:getDay ( what )
+    if what then isString(what); end
+
     local what  = (what) or 'number'
+
     if what == 'string' then
        if tonumber(self.Day) < 10 then
           return tostring ('0' .. tonumber(self.Day) )
@@ -219,7 +232,8 @@ end
 
 -- 2018-07-15 HCano added getweekDay -- tried !!!
 function Date:getweekDay ( what )
-    	
+    if what then isString(what); end
+
     local fields  = (what) or 'number'
 
     if (fields == '%s') or (fields:lower() == 'name') then  --OK!!!
@@ -233,7 +247,8 @@ end
 
 
 function Date:setYear ( nYear )
-   isNumber(nYear)
+   isNumber(nYear);
+
    if nYear<1970 then
       error ( '\n\n-- año inválido -- '..tostring(nYear)..'\n' )
    end
